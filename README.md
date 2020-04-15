@@ -1,2 +1,3 @@
-# Autoregressive Integrated Moving Average based Near-term Regional Temperature and Precipitation Forecasting (ARIMA.NRTPF) model
+# Statistical Climate Forecasting Integrated for Civil and Environmental Engineering (scifi) Package for R
+
 Use of historical data to forecast near-term regional climate change
