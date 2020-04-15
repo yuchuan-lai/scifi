@@ -1,3 +1,3 @@
-# Statistical Climate Forecasting Integrated for Civil and Environmental Engineering (scifi) Package for R
+# Statistical Climate Forecasting Integrated for Civil and Environmental Engineering (scifi) R Package
 
-Use of historical data to forecast near-term regional climate change
+This package provides an autoregressive integrated moving average (ARIMA) based statistical near-term (2 to 20 years) regional temperature and precipitation forecasting model.
