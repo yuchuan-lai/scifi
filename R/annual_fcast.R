@@ -16,21 +16,28 @@ fcast_annual <- function(hist.obs, num.fcast.yrs = 20, fcast.starting.yr = 2020,
   #' @importFrom stats residuals
   #' @importFrom stats shapiro.test
 
+  hist.yrs <- hist.obs[1, ]
+  num.hist.yrs <- fcast.starting.yr - hist.yrs[1] + 1
+  if (num.fcast.yrs > num.hist.yrs) {
+    str.type <- 2
+  } else {
+    str.type <- 1
+  }
 
   if (forecast.model == "ARIMA") {
-    fcast.output <- ARIMA_fcast_annual(hist.obs, num.fcast.yrs, fcast.starting.yr)
+    fcast.output <- ARIMA_fcast_annual(hist.obs, num.fcast.yrs, fcast.starting.yr, str.type)
   }
   if (forecast.model == "linear") {
-    fcast.output <- LR_fcast_annual(hist.obs, num.fcast.yrs, fcast.starting.yr)
+    fcast.output <- LR_fcast_annual(hist.obs, num.fcast.yrs, fcast.starting.yr, str.type)
   }
   if (forecast.model == "baselineall") {
-    fcast.output <- Baselineall_fcast_annual(hist.obs, num.fcast.yrs, fcast.starting.yr)
+    fcast.output <- Baselineall_fcast_annual(hist.obs, num.fcast.yrs, fcast.starting.yr, str.type)
   }
   if (forecast.model == "baseline30") {
-    fcast.output <- Bl30_fcast_annual(hist.obs, num.fcast.yrs, fcast.starting.yr)
+    fcast.output <- Bl30_fcast_annual(hist.obs, num.fcast.yrs, fcast.starting.yr, str.type)
   }
   if (forecast.model == "gev") {
-    fcast.output <- GEV_fcast_annual(hist.obs, num.fcast.yrs, fcast.starting.yr)
+    fcast.output <- GEV_fcast_annual(hist.obs, num.fcast.yrs, fcast.starting.yr, str.type)
   }
   return(fcast.output)
 }
@@ -43,7 +50,7 @@ BoxCox.rev <- function(x, lambda)  {
   }
 }
 
-ARIMA_fcast_annual <- function(hist.obs, num.fcast.yrs, fcast.starting.yr) {
+ARIMA_fcast_annual <- function(hist.obs, num.fcast.yrs, fcast.starting.yr, str.type) {
 
 
   # as some cities may have missing years in the recent record, the following steps are used to allow a fixable starting year
@@ -177,24 +184,41 @@ ARIMA_fcast_annual <- function(hist.obs, num.fcast.yrs, fcast.starting.yr) {
 
   }
 
-  fcast.yrs.df <- c(fcast.yrs, rep(NA, (length(fit.yrs) - num.fcast.yrs.actual)))
-  pred.mean <-c(pred.mean, rep(NA, (length(fit.yrs) - num.fcast.yrs.actual)))
-  pred95.low <- c(pred95.low.arima, rep(NA, (length(fit.yrs) - num.fcast.yrs.actual)))
-  pred95.upp <- c(pred95.upp.arima, rep(NA, (length(fit.yrs) - num.fcast.yrs.actual)))
-  pred80.low <- c(pred80.low.arima, rep(NA, (length(fit.yrs) - num.fcast.yrs.actual)))
-  pred80.upp <- c(pred80.upp.arima, rep(NA, (length(fit.yrs) - num.fcast.yrs.actual)))
+  if (str.type == 2) {
+    fit.yrs.df <- c(fit.yrs, rep(NA, (num.fcast.yrs.actual - length(fit.yrs))))
+    hist.fit <-c(hist.fit, rep(NA, (num.fcast.yrs.actual - length(fit.yrs))))
+    hist.obs.data <- c(hist.obs.data, rep(NA, (num.fcast.yrs.actual - length(fit.yrs))))
+    residuals.fit <- c(residuals.fit, rep(NA, (num.fcast.yrs.actual - length(fit.yrs))))
+    hist.eva.yrs.df <- c(hist.eva.obs[, 1], rep(NA, (num.fcast.yrs.actual - num.eva.yrs)))
+    hist.eva.obs.df <- c(hist.eva.data, rep(NA, (num.fcast.yrs.actual - num.eva.yrs)))
+    pred95.low <- pred95.low.arima
+    pred95.upp <- pred95.upp.arima
+    pred80.low <- pred80.low.arima
+    pred80.upp <- pred80.upp.arima
+    fcast.output <- data.frame("fcast.yrs" = fcast.yrs, "median" = pred.mean, "low95" = pred95.low,
+                               "upp95" = pred95.upp, "low80" = pred80.low, "upp80" = pred80.upp,
+                               "hist.yrs" = fit.yrs.df, "hist.fit" = hist.fit, "obs" = hist.obs.data, "res" = residuals.fit,
+                               "hist.eva.yrs" = hist.eva.yrs.df, "hist.eva.obs" = hist.eva.obs.df)
+  } else {
+    fcast.yrs.df <- c(fcast.yrs, rep(NA, (length(fit.yrs) - num.fcast.yrs.actual)))
+    pred.mean <-c(pred.mean, rep(NA, (length(fit.yrs) - num.fcast.yrs.actual)))
+    pred95.low <- c(pred95.low.arima, rep(NA, (length(fit.yrs) - num.fcast.yrs.actual)))
+    pred95.upp <- c(pred95.upp.arima, rep(NA, (length(fit.yrs) - num.fcast.yrs.actual)))
+    pred80.low <- c(pred80.low.arima, rep(NA, (length(fit.yrs) - num.fcast.yrs.actual)))
+    pred80.upp <- c(pred80.upp.arima, rep(NA, (length(fit.yrs) - num.fcast.yrs.actual)))
 
-  hist.eva.yrs.df <- c(hist.eva.obs[, 1], rep(NA, (length(fit.yrs) - num.eva.yrs)))
-  hist.eva.obs.df <- c(hist.eva.data, rep(NA, (length(fit.yrs) - num.eva.yrs)))
+    hist.eva.yrs.df <- c(hist.eva.obs[, 1], rep(NA, (length(fit.yrs) - num.eva.yrs)))
+    hist.eva.obs.df <- c(hist.eva.data, rep(NA, (length(fit.yrs) - num.eva.yrs)))
 
-  fcast.output <- data.frame("fcast.yrs" = fcast.yrs.df, "median" = pred.mean, "low95" = pred95.low,
-                             "upp95" = pred95.upp, "low80" = pred80.low, "upp80" = pred80.upp,
-                             "hist.yrs" = fit.yrs, "hist.fit" = hist.fit, "obs" = hist.obs.data, "res" = residuals.fit,
-                             "hist.eva.yrs" = hist.eva.yrs.df, "hist.eva.obs" = hist.eva.obs.df)
+    fcast.output <- data.frame("fcast.yrs" = fcast.yrs.df, "median" = pred.mean, "low95" = pred95.low,
+                               "upp95" = pred95.upp, "low80" = pred80.low, "upp80" = pred80.upp,
+                               "hist.yrs" = fit.yrs, "hist.fit" = hist.fit, "obs" = hist.obs.data, "res" = residuals.fit,
+                               "hist.eva.yrs" = hist.eva.yrs.df, "hist.eva.obs" = hist.eva.obs.df)
+  }
   return(fcast.output)
 }
 
-LR_fcast_annual <- function(hist.obs, num.fcast.yrs, fcast.starting.yr) {
+LR_fcast_annual <- function(hist.obs, num.fcast.yrs, fcast.starting.yr, str.type) {
 
   colnames(hist.obs) <- c("year", "obs")
 
@@ -222,6 +246,25 @@ LR_fcast_annual <- function(hist.obs, num.fcast.yrs, fcast.starting.yr) {
   fcast.yrs.df <- data.frame("year" = fcast.yrs)
   LR.fcast_80 <- predict.lm(LR.fit, fcast.yrs.df, interval = "prediction", level = 0.8)[c(1:num.fcast.yrs.actual),]
   LR.fcast_95 <- predict.lm(LR.fit, fcast.yrs.df, interval = "prediction", level = 0.95)[c(1:num.fcast.yrs.actual),]
+
+  if (str.type == 2) {
+    fit.yrs.df <- c(fit.yrs, rep(NA, (num.fcast.yrs.actual - length(fit.yrs))))
+    hist.fit <-c(hist.fit, rep(NA, (num.fcast.yrs.actual - length(fit.yrs))))
+    hist.obs.data <- c(hist.obs.data, rep(NA, (num.fcast.yrs.actual - length(fit.yrs))))
+    residuals.fit <- c(residuals.fit, rep(NA, (num.fcast.yrs.actual - length(fit.yrs))))
+    hist.eva.yrs.df <- c(hist.eva.obs[, 1], rep(NA, (num.fcast.yrs.actual - num.eva.yrs)))
+    hist.eva.obs.df <- c(hist.eva.data, rep(NA, (num.fcast.yrs.actual - num.eva.yrs)))
+    pred.mean <- LR.fcast_80[, 1]
+    pred95.low <- LR.fcast_95[, 2]
+    pred95.upp <- LR.fcast_95[, 3]
+    pred80.low <- LR.fcast_80[, 2]
+    pred80.upp <- LR.fcast_80[, 3]
+    fcast.output <- data.frame("fcast.yrs" = fcast.yrs, "median" = pred.mean, "low95" = pred95.low,
+                               "upp95" = pred95.upp, "low80" = pred80.low, "upp80" = pred80.upp,
+                               "hist.yrs" = fit.yrs.df, "hist.fit" = hist.fit, "obs" = hist.obs.data, "res" = residuals.fit,
+                               "hist.eva.yrs" = hist.eva.yrs.df, "hist.eva.obs" = hist.eva.obs.df)
+  } else {
+
   fcast.yrs.df <- c(fcast.yrs, rep(NA, (length(fit.yrs) - num.fcast.yrs.actual)))
   pred.mean <-c(LR.fcast_80[, 1], rep(NA, (length(fit.yrs) - num.fcast.yrs.actual)))
   pred95.low <- c(LR.fcast_95[, 2], rep(NA, (length(fit.yrs) - num.fcast.yrs.actual)))
@@ -236,10 +279,11 @@ LR_fcast_annual <- function(hist.obs, num.fcast.yrs, fcast.starting.yr) {
                              "upp95" = pred95.upp, "low80" = pred80.low, "upp80" = pred80.upp,
                              "hist.yrs" = fit.yrs, "hist.fit" = hist.fit, "obs" = hist.obs.data, "res" = residuals.fit,
                              "hist.eva.yrs" = hist.eva.yrs.df, "hist.eva.obs" = hist.eva.obs.df)
+  }
   return(fcast.output)
 }
 
-Baselineall_fcast_annual <- function(hist.obs, num.fcast.yrs, fcast.starting.yr) {
+Baselineall_fcast_annual <- function(hist.obs, num.fcast.yrs, fcast.starting.yr, str.type) {
 
   colnames(hist.obs) <- c("year", "obs")
 
@@ -263,6 +307,24 @@ Baselineall_fcast_annual <- function(hist.obs, num.fcast.yrs, fcast.starting.yr)
 
   hist.fit <- rep(fcast.data[3], length(hist.yrs))
   residuals.fit <- hist.obs.data - hist.fit
+
+  if (str.type == 2) {
+    fit.yrs.df <- c(fit.yrs, rep(NA, (num.fcast.yrs.actual - length(fit.yrs))))
+    hist.fit <-c(hist.fit, rep(NA, (num.fcast.yrs.actual - length(fit.yrs))))
+    hist.obs.data <- c(hist.obs.data, rep(NA, (num.fcast.yrs.actual - length(fit.yrs))))
+    residuals.fit <- c(residuals.fit, rep(NA, (num.fcast.yrs.actual - length(fit.yrs))))
+    hist.eva.yrs.df <- c(hist.eva.obs[, 1], rep(NA, (num.fcast.yrs.actual - num.eva.yrs)))
+    hist.eva.obs.df <- c(hist.eva.data, rep(NA, (num.fcast.yrs.actual - num.eva.yrs)))
+    pred.mean <- rep(fcast.data[3], num.fcast.yrs)
+    pred95.low <- rep(fcast.data[1], num.fcast.yrs)
+    pred95.upp <- rep(fcast.data[5], num.fcast.yrs)
+    pred80.low <- rep(fcast.data[2], num.fcast.yrs)
+    pred80.upp <- rep(fcast.data[4], num.fcast.yrs)
+    fcast.output <- data.frame("fcast.yrs" = fcast.yrs, "median" = pred.mean, "low95" = pred95.low,
+                               "upp95" = pred95.upp, "low80" = pred80.low, "upp80" = pred80.upp,
+                               "hist.yrs" = fit.yrs.df, "hist.fit" = hist.fit, "obs" = hist.obs.data, "res" = residuals.fit,
+                               "hist.eva.yrs" = hist.eva.yrs.df, "hist.eva.obs" = hist.eva.obs.df)
+  } else {
   fcast.yrs.df <- c(fcast.yrs, rep(NA, (length(fit.yrs) - num.fcast.yrs.actual)))
   pred.mean <-c(rep(fcast.data[3], num.fcast.yrs), rep(NA, (length(fit.yrs) - num.fcast.yrs.actual)))
   pred95.low <- c(rep(fcast.data[1], num.fcast.yrs), rep(NA, (length(fit.yrs) - num.fcast.yrs.actual)))
@@ -277,10 +339,11 @@ Baselineall_fcast_annual <- function(hist.obs, num.fcast.yrs, fcast.starting.yr)
                              "upp95" = pred95.upp, "low80" = pred80.low, "upp80" = pred80.upp,
                              "hist.yrs" = fit.yrs, "hist.fit" = hist.fit, "obs" = hist.obs.data, "res" = residuals.fit,
                              "hist.eva.yrs" = hist.eva.yrs.df, "hist.eva.obs" = hist.eva.obs.df)
+  }
   return(fcast.output)
 }
 
-Bl30_fcast_annual <- function(hist.obs, num.fcast.yrs, fcast.starting.yr) {
+Bl30_fcast_annual <- function(hist.obs, num.fcast.yrs, fcast.starting.yr, str.type) {
 
   colnames(hist.obs) <- c("year", "obs")
 
@@ -310,6 +373,27 @@ Bl30_fcast_annual <- function(hist.obs, num.fcast.yrs, fcast.starting.yr) {
 
   hist.fit <- rep(fcast.data[3], 30)
   residuals.fit <- hist.level.df$obs - hist.fit
+  hist.fit <- c(rep(NA, (nrow(hist.obs.df) - 30)), hist.fit)
+  residuals.fit <- c(rep(NA, (nrow(hist.obs.df) - 30)), residuals.fit)
+
+  if (str.type == 2) {
+    fit.yrs.df <- c(hist.yrs, rep(NA, (num.fcast.yrs.actual - length(hist.yrs))))
+    hist.fit <-c(hist.fit, rep(NA, (num.fcast.yrs.actual - length(hist.yrs))))
+    hist.obs.data <- c(hist.obs.data, rep(NA, (num.fcast.yrs.actual - length(hist.yrs))))
+    residuals.fit <- c(residuals.fit, rep(NA, (num.fcast.yrs.actual - length(hist.yrs))))
+    hist.eva.yrs.df <- c(hist.eva.obs[, 1], rep(NA, (num.fcast.yrs.actual - num.eva.yrs)))
+    hist.eva.obs.df <- c(hist.eva.data, rep(NA, (num.fcast.yrs.actual - num.eva.yrs)))
+    pred.mean <- rep(fcast.data[3], num.fcast.yrs)
+    pred95.low <- rep(fcast.data[1], num.fcast.yrs)
+    pred95.upp <- rep(fcast.data[5], num.fcast.yrs)
+    pred80.low <- rep(fcast.data[2], num.fcast.yrs)
+    pred80.upp <- rep(fcast.data[4], num.fcast.yrs)
+    fcast.output <- data.frame("fcast.yrs" = fcast.yrs, "median" = pred.mean, "low95" = pred95.low,
+                               "upp95" = pred95.upp, "low80" = pred80.low, "upp80" = pred80.upp,
+                               "hist.yrs" = fit.yrs.df, "hist.fit" = hist.fit, "obs" = hist.obs.data, "res" = residuals.fit,
+                               "hist.eva.yrs" = hist.eva.yrs.df, "hist.eva.obs" = hist.eva.obs.df)
+  } else {
+
   fcast.yrs.df <- c(fcast.yrs, rep(NA, (length(hist.yrs) - num.fcast.yrs.actual)))
   pred.mean <-c(rep(fcast.data[3], num.fcast.yrs), rep(NA, (length(hist.yrs) - num.fcast.yrs.actual)))
   pred95.low <- c(rep(fcast.data[1], num.fcast.yrs), rep(NA, (length(hist.yrs) - num.fcast.yrs.actual)))
@@ -318,9 +402,6 @@ Bl30_fcast_annual <- function(hist.obs, num.fcast.yrs, fcast.starting.yr) {
   pred80.upp <- c(rep(fcast.data[4], num.fcast.yrs), rep(NA, (length(hist.yrs) - num.fcast.yrs.actual)))
 
 
-  hist.fit <- c(rep(NA, (nrow(hist.obs.df) - 30)), hist.fit)
-  residuals.fit <- c(rep(NA, (nrow(hist.obs.df) - 30)), residuals.fit)
-
   hist.eva.yrs.df <- c(hist.eva.obs[, 1], rep(NA, (length(hist.yrs) - num.eva.yrs)))
   hist.eva.obs.df <- c(hist.eva.data, rep(NA, (length(hist.yrs) - num.eva.yrs)))
 
@@ -328,10 +409,11 @@ Bl30_fcast_annual <- function(hist.obs, num.fcast.yrs, fcast.starting.yr) {
                              "upp95" = pred95.upp, "low80" = pred80.low, "upp80" = pred80.upp,
                              "hist.yrs" = hist.yrs, "hist.fit" = hist.fit, "obs" = hist.obs.data, "res" = residuals.fit,
                              "hist.eva.yrs" = hist.eva.yrs.df, "hist.eva.obs" = hist.eva.obs.df)
+  }
   return(fcast.output)
 }
 
-GEV_fcast_annual <- function(hist.obs, num.fcast.yrs, fcast.starting.yr) {
+GEV_fcast_annual <- function(hist.obs, num.fcast.yrs, fcast.starting.yr, str.type) {
 
   colnames(hist.obs) <- c("year", "obs")
 
@@ -385,12 +467,23 @@ GEV_fcast_annual <- function(hist.obs, num.fcast.yrs, fcast.starting.yr) {
 
     hist.fit <- gev.mean.fit
     residuals.fit <- hist.obs.data - gev.mean.fit
+
+    if (str.type == 2) {
+      hist.fit <-c(hist.fit, rep(NA, (num.fcast.yrs.actual - length(fit.yrs))))
+      residuals.fit <- c(residuals.fit, rep(NA, (num.fcast.yrs.actual - length(fit.yrs))))
+      pred.mean <- fcast.mean.gev
+      pred95.low <- pred95.low.gev
+      pred95.upp <- pred95.upp.gev
+      pred80.low <- pred80.low.gev
+      pred80.upp <- pred80.upp.gev
+    } else {
     fcast.yrs.df <- c(fcast.yrs, rep(NA, (length(fit.yrs) - num.fcast.yrs.actual)))
     pred.mean <-c(fcast.mean.gev, rep(NA, (length(fit.yrs) - num.fcast.yrs.actual)))
     pred95.low <- c(pred95.low.gev, rep(NA, (length(fit.yrs) - num.fcast.yrs.actual)))
     pred95.upp <- c(pred95.upp.gev, rep(NA, (length(fit.yrs) - num.fcast.yrs.actual)))
     pred80.low <- c(pred80.low.gev, rep(NA, (length(fit.yrs) - num.fcast.yrs.actual)))
     pred80.upp <- c(pred80.upp.gev, rep(NA, (length(fit.yrs) - num.fcast.yrs.actual)))
+    }
   }
 
   # GEV fitting with MLE can lead to unrealistic fitting, therefore it's crucial to check if the results of fitting
@@ -423,14 +516,33 @@ GEV_fcast_annual <- function(hist.obs, num.fcast.yrs, fcast.starting.yr) {
                                length.out = num.fcast.yrs.actual)
       hist.fit <- gev.mean.fit
       residuals.fit <- hist.obs.data - gev.mean.fit
+      if (str.type == 2) {
+        hist.fit <-c(hist.fit, rep(NA, (num.fcast.yrs.actual - length(fit.yrs))))
+        residuals.fit <- c(residuals.fit, rep(NA, (num.fcast.yrs.actual - length(fit.yrs))))
+        pred.mean <- fcast.mean.gev
+        pred95.low <- pred95.low.gev
+        pred95.upp <- pred95.upp.gev
+        pred80.low <- pred80.low.gev
+        pred80.upp <- pred80.upp.gev
+      } else {
       fcast.yrs.df <- c(fcast.yrs, rep(NA, (length(fit.yrs) - num.fcast.yrs.actual)))
       pred.mean <-c(fcast.mean.gev, rep(NA, (length(fit.yrs) - num.fcast.yrs.actual)))
       pred95.low <- c(pred95.low.gev, rep(NA, (length(fit.yrs) - num.fcast.yrs.actual)))
       pred95.upp <- c(pred95.upp.gev, rep(NA, (length(fit.yrs) - num.fcast.yrs.actual)))
       pred80.low <- c(pred80.low.gev, rep(NA, (length(fit.yrs) - num.fcast.yrs.actual)))
       pred80.upp <- c(pred80.upp.gev, rep(NA, (length(fit.yrs) - num.fcast.yrs.actual)))
+      }
 
     } else {
+      if (str.type == 2) {
+        hist.fit <- rep(NA, num.fcast.yrs.actual)
+        residuals.fit <- rep(NA, num.fcast.yrs.actual)
+        pred.mean <- rep(NA, num.fcast.yrs.actual)
+        pred95.low <- rep(NA, num.fcast.yrs.actual)
+        pred95.upp <- rep(NA, num.fcast.yrs.actual)
+        pred80.low <- rep(NA, num.fcast.yrs.actual)
+        pred80.upp <- rep(NA, num.fcast.yrs.actual)
+      } else {
       hist.fit <- rep(NA, length(fit.yrs))
       residuals.fit <- rep(NA, length(fit.yrs))
       fcast.yrs.df <- c(fcast.yrs, rep(NA, (length(fit.yrs) - num.fcast.yrs.actual)))
@@ -439,15 +551,29 @@ GEV_fcast_annual <- function(hist.obs, num.fcast.yrs, fcast.starting.yr) {
       pred95.upp <- rep(NA, length(fit.yrs))
       pred80.low <- rep(NA, length(fit.yrs))
       pred80.upp <- rep(NA, length(fit.yrs))
+      }
     }
   }
 
-  hist.eva.yrs.df <- c(hist.eva.obs[, 1], rep(NA, (length(fit.yrs) - num.eva.yrs)))
-  hist.eva.obs.df <- c(hist.eva.data, rep(NA, (length(fit.yrs) - num.eva.yrs)))
+  if (str.type == 2) {
+    fit.yrs.df <- c(fit.yrs, rep(NA, (num.fcast.yrs.actual - length(fit.yrs))))
+    hist.obs.data <- c(hist.obs.data, rep(NA, (num.fcast.yrs.actual - length(fit.yrs))))
+    hist.eva.yrs.df <- c(hist.eva.obs[, 1], rep(NA, (num.fcast.yrs.actual - num.eva.yrs)))
+    hist.eva.obs.df <- c(hist.eva.data, rep(NA, (num.fcast.yrs.actual - num.eva.yrs)))
+    fcast.output <- data.frame("fcast.yrs" = fcast.yrs, "median" = pred.mean, "low95" = pred95.low,
+                               "upp95" = pred95.upp, "low80" = pred80.low, "upp80" = pred80.upp,
+                               "hist.yrs" = fit.yrs.df, "hist.fit" = hist.fit, "obs" = hist.obs.data, "res" = residuals.fit,
+                               "hist.eva.yrs" = hist.eva.yrs.df, "hist.eva.obs" = hist.eva.obs.df)
 
-  fcast.output <- data.frame("fcast.yrs" = fcast.yrs.df, "median" = pred.mean, "low95" = pred95.low,
-                             "upp95" = pred95.upp, "low80" = pred80.low, "upp80" = pred80.upp,
-                             "hist.yrs" = fit.yrs, "hist.fit" = hist.fit, "obs" = hist.obs.data, "res" = residuals.fit,
-                             "hist.eva.yrs" = hist.eva.yrs.df, "hist.eva.obs" = hist.eva.obs.df)
+  } else {
+    hist.eva.yrs.df <- c(hist.eva.obs[, 1], rep(NA, (length(fit.yrs) - num.eva.yrs)))
+    hist.eva.obs.df <- c(hist.eva.data, rep(NA, (length(fit.yrs) - num.eva.yrs)))
+
+    fcast.output <- data.frame("fcast.yrs" = fcast.yrs.df, "median" = pred.mean, "low95" = pred95.low,
+                               "upp95" = pred95.upp, "low80" = pred80.low, "upp80" = pred80.upp,
+                               "hist.yrs" = fit.yrs, "hist.fit" = hist.fit, "obs" = hist.obs.data, "res" = residuals.fit,
+                               "hist.eva.yrs" = hist.eva.yrs.df, "hist.eva.obs" = hist.eva.obs.df)
+  }
+
   return(fcast.output)
 }

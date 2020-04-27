@@ -24,7 +24,7 @@ plot_annual <- function (fcast.output) {
       ggplot2::geom_point(data = hist.eva.df, ggplot2::aes(x = hist.eva.yrs, y = hist.eva.obs, col = "#CC0033")) +
       ggplot2::theme(axis.title.y = ggplot2::element_blank(), legend.position = "right") +
       ggplot2::scale_fill_manual(guide = ggplot2::guide_legend(override.aes = list(linetype = c("blank", "blank"), shape = c(NA, NA))),
-                                 labels = c("80%", "95%"), values = c("#FF660040", "#FF660070") , name = "Prediction intervals") +
+                                 labels = c("80%", "95%"), values = c("#FF660070", "#FF660040") , name = "Prediction intervals") +
       ggplot2::scale_color_manual(guide = ggplot2::guide_legend(override.aes = list(linetype = c("blank", "solid", "blank", "solid"), shape = c(16, NA, 16, NA),
                                                                                     color = c("#FF9900", "red","#CC0033", "#660000"))),
                                   labels = c("historical observations", "model fitting", "new observations", "point forecast"),
@@ -38,7 +38,7 @@ plot_annual <- function (fcast.output) {
       ggplot2::geom_line(data = fcast.df, ggplot2::aes(x = fcast.yrs, y = median, col = "#660000"), size = 1) +
       ggplot2::theme(axis.title.y = ggplot2::element_blank(), legend.position = "right") +
       ggplot2::scale_fill_manual(guide = ggplot2::guide_legend(override.aes = list(linetype = c("blank", "blank"), shape = c(NA, NA))),
-                                 labels = c("80%", "95%"), values = c("#FF660040", "#FF660070") , name = "Prediction intervals") +
+                                 labels = c("80%", "95%"), values = c("#FF660070", "#FF660040") , name = "Prediction intervals") +
       ggplot2::scale_color_manual(guide = ggplot2::guide_legend(override.aes = list(linetype = c("blank", "solid", "solid"), shape = c(16, NA, NA),
                                                                                     color = c("#FF9900", "red", "#660000"))),
                                   labels = c("historical observations", "model fitting", "point forecast"),
