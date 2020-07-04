@@ -1,0 +1,28 @@
+Package: scifi
+Title: Statistical Climate Forecasting Integrated for Civil and Environmental Engineering
+Version: 0.8.5
+Authors@R: c(
+    person(given = "Yuchuan", family = "Lai", role = "cre", email = "ylai1@andrew.cmu.edu"),
+    person(given = "David A.", family = "Dzombak", role = "aut", email = "dzombak@cmu.edu"))
+Description: Obtain the ARIMA based statistical forecasting of temperature and precipitation at individual 
+    city for engineering applications. Forecasting techniques include the annual temperature an precipitation
+    forecasting, estimating confidence levels for annual extremes with return periods, and simulating future 
+    daily temperature and precipitation. Additional functions for downloading available historical observations 
+    from more than 100 US cities, annual forecasting of other statistical techniques, and plotting the obtained 
+    forecasts are provided.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Imports: 
+    extRemes,
+    dplyr,
+    forecast,
+    ggplot2,
+    gridExtra,
+    lubridate,
+    Kendall,
+    matrixStats,
+    reshape2,
+    xts,
+    zoo
+RoxygenNote: 6.1.1
