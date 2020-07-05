@@ -108,10 +108,15 @@ fcast_daily <- function(hist.obs.daily, num.fcast.yr = 20, fcast.starting.yr = 2
   prcp.daily.log.xts <- log(prcp.daily.xts + 1)
   prcp.daily.log.df <- data.frame(Date = daily.dates, Value = as.numeric(as.character(prcp.daily.log.xts)))
 
+  # Generate dataframes for all daily data for later use
+  tmax.daily.all.df <- data.frame(Date = as.Date(hist.obs.daily$Date), Value = as.numeric(as.character(hist.obs.daily$tmax)))
+  tmin.daily.all.df <- data.frame(Date = as.Date(hist.obs.daily$Date), Value = as.numeric(as.character(hist.obs.daily$tmin)))
+  prcp.daily.all.df <- data.frame(Date = as.Date(hist.obs.daily$Date), Value = log(hist.obs.daily$prcp + 1))
+
   # Calculate the missing daily data for later use:
-  tmax.daily.na.df <- data.frame(Date = tmax.daily.df$Date, Value = is.na(tmax.daily.df$Value))
-  tmin.daily.na.df <- data.frame(Date = tmin.daily.df$Date, Value = is.na(tmin.daily.df$Value))
-  prcp.daily.na.df <- data.frame(Date = prcp.daily.log.df$Date, Value = is.na(prcp.daily.log.df$Value))
+  tmax.daily.na.df <- data.frame(Date = as.Date(hist.obs.daily$Date), Value = is.na(tmax.daily.all.df$Value))
+  tmin.daily.na.df <- data.frame(Date = as.Date(hist.obs.daily$Date), Value = is.na(tmin.daily.all.df$Value))
+  prcp.daily.na.df <- data.frame(Date = as.Date(hist.obs.daily$Date), Value = is.na(prcp.daily.all.df$Value))
   tmax.daily.na.dcast <- dcast_data(tmax.daily.na.df)
   tmin.daily.na.dcast <- dcast_data(tmin.daily.na.df)
   prcp.daily.na.dcast <- dcast_data(prcp.daily.na.df)
@@ -265,9 +270,6 @@ fcast_daily <- function(hist.obs.daily, num.fcast.yr = 20, fcast.starting.yr = 2
         if (any(is.na(tmax.daily.na.eva) == TRUE) | any(is.na(tmin.daily.na.eva) == TRUE) | any(is.na(prcp.daily.na.eva) == TRUE)){
           select.date <- sampling_date(current.fcast.yr, bt.hist.yr, jj, extra.days.for.bt)
           select.date.eva <- data.frame("Date" = select.date$select.date)
-          tmax.daily.na.eva <- merge(select.date.eva, tmax.daily.na.df)
-          tmin.daily.na.eva <- merge(select.date.eva, tmin.daily.na.df)
-          prcp.daily.na.eva <- merge(select.date.eva, prcp.daily.na.df)
         }
 
         select.date.year <- rbind(select.date.year, select.date)
@@ -276,15 +278,15 @@ fcast_daily <- function(hist.obs.daily, num.fcast.yr = 20, fcast.starting.yr = 2
       # select.date.df <- cbind(current.year.dates, select.date.year)
 
       select.date.hist <- data.frame("Date" = select.date.year$select.date)
-      hist.select.daily.tmax <- merge(select.date.hist, tmax.daily.df, by = "Date", sort = FALSE)
-      hist.select.daily.tmin <- merge(select.date.hist, tmin.daily.df, by = "Date", sort = FALSE)
-      hist.select.daily.prcp <- merge(select.date.hist, prcp.daily.log.df, by = "Date", sort = FALSE)
+      hist.select.daily.tmax <- merge(select.date.hist, tmax.daily.all.df, by = "Date", sort = FALSE, all.x = TRUE)
+      hist.select.daily.tmin <- merge(select.date.hist, tmin.daily.all.df, by = "Date", sort = FALSE, all.x = TRUE)
+      hist.select.daily.prcp <- merge(select.date.hist, prcp.daily.all.df, by = "Date", sort = FALSE, all.x = TRUE)
       hist.select.daily.prcp$Value[hist.select.daily.prcp$Value == 0] <- NA
 
       select.date.fitted <- data.frame("Date" = select.date.year$baseline.date)
-      hist.fitted.select.daily.tmax <- merge(select.date.fitted, fitted.daily.tmax, by = "Date", sort = FALSE)
-      hist.fitted.select.daily.tmin <- merge(select.date.fitted, fitted.daily.tmin, by = "Date", sort = FALSE)
-      hist.fitted.select.daily.prcp <- merge(select.date.fitted, fitted.daily.prcp, by = "Date", sort = FALSE)
+      hist.fitted.select.daily.tmax <- merge(select.date.fitted, fitted.daily.tmax, by = "Date", sort = FALSE, all.x = TRUE)
+      hist.fitted.select.daily.tmin <- merge(select.date.fitted, fitted.daily.tmin, by = "Date", sort = FALSE, all.x = TRUE)
+      hist.fitted.select.daily.prcp <- merge(select.date.fitted, fitted.daily.prcp, by = "Date", sort = FALSE, all.x = TRUE)
 
       residuals.daily.tmax <- hist.select.daily.tmax$Value - hist.fitted.select.daily.tmax$Value
       residuals.daily.tmin <- hist.select.daily.tmin$Value - hist.fitted.select.daily.tmin$Value
@@ -333,8 +335,8 @@ fcast_daily <- function(hist.obs.daily, num.fcast.yr = 20, fcast.starting.yr = 2
         next.year.fcast <- current.fcast.yr + 1
 
         # Baseline for the next forecasting year is added
-        fcast.dates.new <- seq(as.Date(paste0(next.year.fcast, "-01-01")), as.Date(paste0(next.year.fcast, "-12-31")), by="days")
-        fcast.month.new <- seq(as.Date(paste0(next.year.fcast, "-01-01")), as.Date(paste0(next.year.fcast, "-12-01")), by="month")
+        fcast.dates.new <- seq(as.Date(paste0(next.year.fcast, "-01-01")), as.Date(paste0(next.year.fcast, "-12-31")), by = "days")
+        fcast.month.new <- seq(as.Date(paste0(next.year.fcast, "-01-01")), as.Date(paste0(next.year.fcast, "-12-01")), by = "month")
         fcast.daily.baseline.tmax <- data.frame(Date = fcast.dates.new,
                                                 Value = stats::setNames(arima.fcast.tmax.new$mean,
                                                                         as.Date(fcast.month.new))[format(fcast.dates.new,
