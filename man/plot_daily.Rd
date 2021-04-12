@@ -29,7 +29,9 @@ Background information about the statistical forecasting models applied can be f
 A ggplot object, including a probability density function plot and aggregated annual average of daily simulaitons plot. Blue colored lines are the individual simulated series while black line in pdf plot and black points in annual plot represent the historical observations.
 }
 \references{
-Lai, Y., & Dzombak, D. A. (in press). Use of the Autoregressive Integrated Moving Average (ARIMA) Model to Forecast Near-term Regional Temperature and Precipitation. Weather and Forecasting.
+Lai, Y., and Dzombak, D. A., 2021: Use of Integrated Global Climate Model Simulations and Statistical Time Series Forecasting to Project Regional Temperature and Precipitation. Journal of Applied Meteorology and Climatology.
+
+Lai, Y., and Dzombak, D. A., 2020: Use of the Autoregressive Integrated Moving Average (ARIMA) Model to Forecast Near-term Regional Temperature and Precipitation. Weather and Forecasting.
 }
 \author{
 Yuchuan Lai

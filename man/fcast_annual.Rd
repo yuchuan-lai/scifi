@@ -36,14 +36,14 @@ A dataframe object that contains the information about the historical fitting, r
 \references{
 Hyndman, R. J., and G. Athanasopoulos, 2018: Forecasting: principles and practice. OTexts,. ——, and Coauthors, 2018: forecast: Forecasting functions for time series and linear models.
 
-Lai, Y., & Dzombak, D. A. (in press). Use of the Autoregressive Integrated Moving Average (ARIMA) Model to Forecast Near-term Regional Temperature and Precipitation. Weather and Forecasting.
+Lai, Y., and Dzombak, D. A, 2020. Use of the Autoregressive Integrated Moving Average (ARIMA) Model to Forecast Near-term Regional Temperature and Precipitation. Weather and Forecasting.
 }
 \author{
 Yuchuan Lai
 }
 
 \seealso{
-See Also as \code{\link{fcast_annual_cl}} and \code{\link{fcast_daily}}
+See also \code{\link{fcast_annual_cl}} and \code{\link{fcast_daily}}
 }
 
 \examples{

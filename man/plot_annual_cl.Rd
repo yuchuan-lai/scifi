@@ -25,11 +25,13 @@ Further bckground information about the statistical forecasting models applied c
 A ggplot object.
 }
 \references{
-Lai, Y., & Dzombak, D. A. (in press). Use of the Autoregressive Integrated Moving Average (ARIMA) Model to Forecast Near-term Regional Temperature and Precipitation. Weather and Forecasting.
+Lai, Y., and Dzombak, D. A., 2021: Use of Integrated Global Climate Model Simulations and Statistical Time Series Forecasting to Project Regional Temperature and Precipitation. Journal of Applied Meteorology and Climatology.
+
+Lai, Y., and Dzombak, D. A., 2020: Use of the Autoregressive Integrated Moving Average (ARIMA) Model to Forecast Near-term Regional Temperature and Precipitation. Weather and Forecasting.
 
 Pascual, L., J. Romo, and R. Esther, 2004: Bootstrap predictive inference for ARIMA processes. J. Time Ser. Anal., 25, 449–465.
 
-Pascual, L., J. Romo, and E. Ruiz, 2005: Bootstrap prediction intervals for power-transformed time series. Int. J. Forecast., 21, 219–235, doi:10.1016/j.ijforecast.2004.09.006.
+Pascual, L., J. Romo, and E. Ruiz, 2005: Bootstrap prediction intervals for power-transformed time series. Int. J. Forecast., 21, 219–235.
 }
 \author{
 Yuchuan Lai
