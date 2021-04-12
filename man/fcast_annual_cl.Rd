@@ -42,7 +42,7 @@ A dataframe object that contains the information about the estimated historical 
 \references{
 Hyndman, R. J., and G. Athanasopoulos, 2018: Forecasting: principles and practice. OTexts,. ——, and Coauthors, 2018: forecast: Forecasting functions for time series and linear models.
 
-Lai, Y., & Dzombak, D. A. (in press). Use of the Autoregressive Integrated Moving Average (ARIMA) Model to Forecast Near-term Regional Temperature and Precipitation. Weather and Forecasting.
+Lai, Y., and Dzombak, D. A., 2020: Use of the Autoregressive Integrated Moving Average (ARIMA) Model to Forecast Near-term Regional Temperature and Precipitation. Weather and Forecasting.
 
 Pascual, L., J. Romo, and R. Esther, 2004: Bootstrap predictive inference for ARIMA processes. J. Time Ser. Anal., 25, 449–465.
 

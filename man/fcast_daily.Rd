@@ -13,7 +13,7 @@ fcast_daily(hist.obs.daily, num.fcast.yr = 20, fcast.starting.yr = 2020, num.set
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{hist.obs.daily}{
-A dataframe object that includes the daily dates, maximum temperature, minimum temperature, and precipitation as four columns. It can be a datafram object that is obtained using \code{\link{download}} function and with `daily` argument.
+A dataframe object that includes the daily dates, maximum temperature, minimum temperature, and precipitation as four columns. It can be a dataframe object that is obtained using \code{\link{download}} function and with `daily` argument.
 }
   \item{num.fcast.yr}{
 A number of forecasting years. Number of forecasting years is recommended to be less than 20 years as long-term forecasts are unreliable because of climate variability.
@@ -45,7 +45,7 @@ Additional informaiton about the time series forecasting and bootstrap can be fo
 \references{
 Hyndman, R. J., and G. Athanasopoulos, 2018: Forecasting: principles and practice. OTexts,. ——, and Coauthors, 2018: forecast: Forecasting functions for time series and linear models.
 
-Lai, Y., & Dzombak, D. A. (in press). Use of the Autoregressive Integrated Moving Average (ARIMA) Model to Forecast Near-term Regional Temperature and Precipitation. Weather and Forecasting.
+Lai, Y., and Dzombak, D. A, 2020. Use of the Autoregressive Integrated Moving Average (ARIMA) Model to Forecast Near-term Regional Temperature and Precipitation. Weather and Forecasting.
 }
 \author{
 Yuchuan Lai
@@ -55,7 +55,7 @@ Yuchuan Lai
 %% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-See Also as \code{\link{fcast_annual}} and \code{\link{fcast_annual_cl}}
+See also \code{\link{fcast_annual}} and \code{\link{fcast_annual_cl}}
 }
 \examples{
 # Download the historical daily data for Pittsburgh
