@@ -5,7 +5,7 @@
 Monthly temperature and precipitation projections of the U.S. from 28 selected GCMs of CMIP5 (RCP4.5)
 }
 \description{
-Obtained monthly GCM temperature and precipitation projections averaged among the grid locations across the contiguous United States. The GCMs belong to CMIP5 and a total of 28 GCMs are included. The projecitons are under RCP4.5. 
+Obtained monthly GCM temperature and precipitation projections averaged among the grid locations across the contiguous United States. The GCMs belong to CMIP5 and a total of 28 GCMs are included. The projecitons are under RCP4.5. Note that the projections were obtained for the grid locations within latitude: 25.12993 to 49.38323 and longitude: -124.6813 to -67.00742, which is slightly different from the projections of the contiguous United States.
 }
 \usage{data("CMIP5.RCP4.5.monthly.US.proj")}
 \format{
