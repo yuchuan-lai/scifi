@@ -285,7 +285,7 @@ ARIMA_init_order <- function(hist.obs, num.fcast.yrs, fcast.starting.yr) {
 
 # The main function for the estimation of confidence intervals for ARIMA forecasting of annual extremes
 #' @export
-fcast_annual_cl <- function(hist.obs, num.fcast.yrs = 20, fcast.starting.yr = 2020, return.period = 5, num.bt = 100, confidence.level = 0.9) {
+fcast_annual_cl <- function(hist.obs, num.fcast.yrs = 20, fcast.starting.yr = 2022, return.period = 5, num.bt = 100, confidence.level = 0.9) {
 
   #' @importFrom matrixStats rowQuantiles
 

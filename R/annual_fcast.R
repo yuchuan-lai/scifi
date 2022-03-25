@@ -1,5 +1,5 @@
 #' @export
-fcast_annual <- function(hist.obs, num.fcast.yrs = 20, fcast.starting.yr = 2020, forecast.model = "ARIMA") {
+fcast_annual <- function(hist.obs, num.fcast.yrs = 20, fcast.starting.yr = 2022, forecast.model = "ARIMA") {
 
   #' @import forecast
   #' @import dplyr

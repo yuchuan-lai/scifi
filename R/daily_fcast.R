@@ -21,7 +21,7 @@ sampling_date <- function(current.fcast.yr, bt.hist.yr, jj, extra.days.for.bt) {
 }
 
 #' @export
-fcast_daily <- function(hist.obs.daily, num.fcast.yr = 20, fcast.starting.yr = 2020, num.sets = 1, extra.days.for.bt = 7) {
+fcast_daily <- function(hist.obs.daily, num.fcast.yr = 20, fcast.starting.yr = 2022, num.sets = 1, extra.days.for.bt = 7) {
 
   #' @import forecast
   #' @import zoo

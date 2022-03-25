@@ -59,7 +59,7 @@ GCM_signal.mon_cal <- function(GCM.month) {
 }
 
 #' @export
-GARIMA_fcast_daily <- function(hist.obs.daily, model.monthly.proj = "default", num.fcast.yr = "default", fcast.starting.yr = 2020, num.sets = 1, extra.days.for.bt = 7) {
+GARIMA_fcast_daily <- function(hist.obs.daily, model.monthly.proj = "default", num.fcast.yr = "default", fcast.starting.yr = 2022, num.sets = 1, extra.days.for.bt = 7) {
   
   #' @import dplyr
   #' @import forecast
