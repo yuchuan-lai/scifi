@@ -72,6 +72,16 @@ ARIMA_fcast_annual <- function(hist.obs, num.fcast.yrs, fcast.starting.yr, str.t
   fcast.yrs <- c(fcast.st.yr:fcast.ed.yr)
   fit.yrs <- hist.yrs
 
+  if (length(unique(hist.obs.data)) == 1) {
+    pred.mean <- rep(hist.obs.data[1], num.fcast.yrs.actual)
+    hist.fit <- hist.obs.data
+    residuals.fit <- rep(0, length(hist.obs.data))
+    pred95.upp.arima <- rep(hist.obs.data[1], num.fcast.yrs.actual)
+    pred95.low.arima <- rep(hist.obs.data[1], num.fcast.yrs.actual)
+    pred80.upp.arima <- rep(hist.obs.data[1], num.fcast.yrs.actual)
+    pred80.low.arima <- rep(hist.obs.data[1], num.fcast.yrs.actual)
+  } else {
+
   trend.test <- Kendall::MannKendall(hist.obs.data)
 
   if (trend.test$sl < 0.2) {
@@ -115,7 +125,8 @@ ARIMA_fcast_annual <- function(hist.obs, num.fcast.yrs, fcast.starting.yr, str.t
         adjust.value <- abs(min(hist.obs.data, na.rm = TRUE) + max(hist.obs.data, na.rm = TRUE)* 1/2)
       } else {
         adjust.value <- min(hist.obs.data[hist.obs.data > 0], na.rm = TRUE) * 1/2 + abs(min(hist.obs.data, na.rm = TRUE))
-      }}
+      }
+      }
 
     hist.obs.data <- hist.obs.data + adjust.value
 
@@ -131,19 +142,27 @@ ARIMA_fcast_annual <- function(hist.obs, num.fcast.yrs, fcast.starting.yr, str.t
 
     auto.arima.fit <- forecast::auto.arima(hist.obs.data, allowdrift = apply.drift, lambda = lambda)
     arima.order <- forecast::arimaorder(auto.arima.fit)
-    arima.fit <- forecast::Arima(hist.obs.data, order = arima.order, include.drift = apply.drift, lambda = auto.arima.fit$lambda)
 
+    arima.try <- try(forecast::Arima(hist.obs.data, order = arima.order, include.drift = apply.drift, lambda = auto.arima.fit$lambda)[1], silent = TRUE)
+    
+    if (any(arima.order != 0) & class(arima.try) != "try-error") {
+      arima.fit <- forecast::Arima(hist.obs.data, order = arima.order, include.drift = apply.drift, lambda = auto.arima.fit$lambda)
+    } else {
+      arima.fit <- forecast::auto.arima(hist.obs.data, allowdrift = apply.drift, lambda = auto.arima.fit$lambda)
+    }
+    
     arima.fcast <- forecast::forecast(arima.fit, h = num.fcast.yrs.actual, level=c(80, 95))
     pred95.upp.arima <- arima.fcast$upper[,2] - adjust.value
     # Prediction level at 95% can return unrealistically large values when lambda = -1
-    if (auto.arima.fit$lambda == -1 & any(pred95.upp.arima > max(hist.obs.data, na.rm = TRUE) * 1.5) & any(is.na(pred95.upp.arima) == FALSE)) {
-      pred95.upp.arima <- rep(NA, length(arima.fcast$upper[,2]))
+    if (auto.arima.fit$lambda == -1 & any(pred95.upp.arima[is.na(pred95.upp.arima) == FALSE] > max(hist.obs.data, na.rm = TRUE) * 1.5) & any(is.na(pred95.upp.arima) == FALSE)) {
+      pred95.upp.arima <- rep(NA, length(arima.fcast$upper[, 2]))
     }
     pred95.low.arima <- arima.fcast$lower[,2] - adjust.value
     pred80.upp.arima <- arima.fcast$upper[,1] - adjust.value
     pred80.low.arima <- arima.fcast$lower[,1] - adjust.value
     pred.mean <- arima.fcast$mean - adjust.value
     hist.fit <- fitted(arima.fit) - adjust.value
+    hist.obs.data <- hist.obs.data - adjust.value
     residuals.fit <- hist.obs.data - hist.fit
 
     if (any(var.name == c("Avg.Temp", "Avg.Tmax", "Avg.Tmin", "TXx", "TNx", "TXn", "TNn")) == FALSE)  {
@@ -160,11 +179,15 @@ ARIMA_fcast_annual <- function(hist.obs, num.fcast.yrs, fcast.starting.yr, str.t
     arima.order <- forecast::arimaorder(forecast::auto.arima(hist.obs.data, allowdrift = apply.drift))
     # Again, here needs to consider if the variable has the same number for all of the years
     # In other words, the three orders for the ARIMA model will all be 0
-    if (any(arima.order != 0)){
+    
+    arima.try <- try(forecast::Arima(hist.obs.data, order = arima.order, include.drift = apply.drift)[1], silent = TRUE)
+    
+    if (any(arima.order != 0) & class(arima.try) != "try-error") {
       arima.fit <- forecast::Arima(hist.obs.data, order = arima.order, include.drift = apply.drift)
     } else {
-      arima.fit <- forecast::auto.arima(hist.obs.data)
+      arima.fit <- forecast::auto.arima(hist.obs.data, allowdrift = apply.drift)
     }
+    
     arima.fcast <- forecast::forecast(arima.fit, h = num.fcast.yrs.actual, level=c(80, 95))
     pred95.upp.arima <- arima.fcast$upper[,2]
     pred95.low.arima <- arima.fcast$lower[,2]
@@ -181,7 +204,7 @@ ARIMA_fcast_annual <- function(hist.obs, num.fcast.yrs, fcast.starting.yr, str.t
       pred80.low.arima[as.numeric(pred80.low.arima) < 0] <- 0
       pred.mean[as.numeric(pred.mean) < 0] <- 0
     }
-
+    }
   }
 
   if (str.type == 2) {
